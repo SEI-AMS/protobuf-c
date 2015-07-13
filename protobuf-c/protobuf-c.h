@@ -341,6 +341,9 @@ struct ProtobufCFieldDescriptor;
 struct ProtobufCIntRange;
 struct ProtobufCMessage;
 struct ProtobufCMessageDescriptor;
+// Added by jdroot 7/9/2015
+struct ProtobufCMessageHandler;
+// End of additions
 struct ProtobufCMessageUnknownField;
 struct ProtobufCMethodDescriptor;
 struct ProtobufCService;
@@ -357,6 +360,9 @@ typedef struct ProtobufCFieldDescriptor ProtobufCFieldDescriptor;
 typedef struct ProtobufCIntRange ProtobufCIntRange;
 typedef struct ProtobufCMessage ProtobufCMessage;
 typedef struct ProtobufCMessageDescriptor ProtobufCMessageDescriptor;
+// Added by jdroot 7/9/2015
+typedef struct ProtobufCMessageHandler ProtobufCMessageHandler;
+// End of additions
 typedef struct ProtobufCMessageUnknownField ProtobufCMessageUnknownField;
 typedef struct ProtobufCMethodDescriptor ProtobufCMethodDescriptor;
 typedef struct ProtobufCService ProtobufCService;
@@ -367,6 +373,12 @@ typedef int protobuf_c_boolean;
 
 typedef void (*ProtobufCClosure)(const ProtobufCMessage *, void *closure_data);
 typedef void (*ProtobufCMessageInit)(ProtobufCMessage *);
+// Added by jdroot 7/9/2015
+typedef size_t            (*ProtobufCMessageGetPackedSize)(const ProtobufCMessage *);
+typedef size_t            (*ProtobufCMessagePack)(const ProtobufCMessage *, uint8_t *);
+typedef ProtobufCMessage *(*ProtobufCMessageUnpack)(ProtobufCAllocator  *, size_t, const uint8_t *);
+typedef void              (*ProtobufCMessageFreeUnpacked)(ProtobufCMessage *, ProtobufCAllocator *);
+// End of additions
 typedef void (*ProtobufCServiceDestroy)(ProtobufCService *);
 
 /**
@@ -684,12 +696,26 @@ struct ProtobufCMessageDescriptor {
 	ProtobufCMessageInit		message_init;
 
 	/** Reserved for future use. */
-	void				*reserved1;
+	// Added by jdroot 7/9/2015
+	const ProtobufCMessageHandler *message_handler;
+	// Removed
+	// void                *reserved1;
+	// End of additions
 	/** Reserved for future use. */
 	void				*reserved2;
 	/** Reserved for future use. */
 	void				*reserved3;
 };
+
+// Added by jdroot 7/9/2015
+struct ProtobufCMessageHandler {
+	ProtobufCMessageInit init;
+	ProtobufCMessageGetPackedSize get_packed_size;
+	ProtobufCMessagePack pack;
+	ProtobufCMessageUnpack unpack;
+	ProtobufCMessageFreeUnpacked free_unpacked;
+};
+// End of additions
 
 /**
  * An unknown message field.

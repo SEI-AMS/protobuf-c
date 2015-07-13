@@ -284,6 +284,10 @@ void MessageGenerator::
 GenerateDescriptorDeclarations(io::Printer* printer) {
   printer->Print("extern const ProtobufCMessageDescriptor $name$__descriptor;\n",
                  "name", FullNameToLower(descriptor_->full_name()));
+  // Added by jdroot on 7/9/2015
+  printer->Print("extern const ProtobufCMessageHandler $name$__handler;\n",
+                 "name", FullNameToLower(descriptor_->full_name()));
+  // End of additions
 
   for (int i = 0; i < descriptor_->nested_type_count(); i++) {
     nested_generators_[i]->GenerateDescriptorDeclarations(printer);
@@ -542,8 +546,27 @@ GenerateMessageDescriptor(io::Printer* printer) {
   "  $n_ranges$,"
   "  $lcclassname$__number_ranges,\n"
   "  (ProtobufCMessageInit) $lcclassname$__init,\n"
-  "  NULL,NULL,NULL    /* reserved[123] */\n"
+  // Added by jdroot on 7/9/2015
+  "  &$lcclassname$__handler,\n"
+  "  NULL,NULL /* reserved[123] */\n"
+  // Removed
+  // "  NULL,NULL,NULL    /* reserved[123] */\n"
+  // End of additions
+  
   "};\n");
+
+  // Added by jdroot on 7/9/2015
+  printer->Print(vars,
+    "const ProtobufCMessageHandler $lcclassname$__handler =\n"
+    "{\n"
+    "    (ProtobufCMessageInit) $lcclassname$__init,\n"
+    "    (ProtobufCMessageGetPackedSize) $lcclassname$__get_packed_size,\n"
+    "    (ProtobufCMessagePack) $lcclassname$__pack,\n"
+    "    (ProtobufCMessageUnpack) $lcclassname$__unpack,\n"
+    "    (ProtobufCMessageFreeUnpacked) $lcclassname$__free_unpacked\n"
+    "};\n");
+  // End of additions
+
 }
 
 }  // namespace c
